@@ -1,16 +1,17 @@
-# This is a sample Python script.
+from api import search_book
+from personal_library import write_to_personal_library, open_personal_library
 
-# Press ⇧F10 to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+user_action = input("What do you want to do?")
 
+#ToDo: Maak een inlog page
+#ToDo:
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+if(user_action == "search"):
+    book_input = input("what book do you want? ")
+    field_input = input("what field do you want? ")
+    search_result = search_book(book_input, field_input)
+    write_to_personal_library(search_result)
+elif(user_action == "open library"):
+    print("opening library")
+    print(open_personal_library())
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
