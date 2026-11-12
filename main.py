@@ -1,15 +1,12 @@
 import logging
 from endpoints.bookname_api import search_book
-from library.personal_library import add_personal_library
+from library.personal_library import add_personal_library, open_personal_library
+from endpoints.authorsearch_api import search_for_author, show_author_works
 
 #logging of the mistakes errors being made
 logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 #TODO: Maak een inlog page (maybe just use an username only, without passwords)
-
-
-
-
 
 
 #search book
@@ -76,14 +73,25 @@ def main_menu():
                 if book_menu == "3":
                     pass
 
-
-
         elif choice == 2: # searching for an author
-        #TODO: look for author Api
+            #TODO: ADD SEARCHING_AUTHOR.PY
             pass
+
         elif choice == 3:
-        #TODO: library with choices, favourite page?
-            pass
+            #TODO: FIX NAMES BEING WEIRD
+            #TODO: (IF I HAVE TIME) ADD DELETING
+            library = open_personal_library()
+            print(f"---{username}'s library ---")
+            for number, item in enumerate(library, start=1):
+                print(f"{item['title']} - {item['author_name']}")
+            delete_menu = input("type 'delete' to delete an item or go back with 0.")
+            if delete_menu == "delete":
+                pass
+            if delete_menu == "0":
+                pass
+
+
+
         elif choice == 4:
             print(f"Goodbye {username}!")
             break
