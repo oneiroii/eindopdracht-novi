@@ -1,4 +1,5 @@
 import json
+#TODO: ADD LOGGING
 
 THE_LIBRARY = "data/personal_library.json"
 

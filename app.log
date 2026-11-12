@@ -9,3 +9,6 @@ WARNING:root:Invalid choice. (Enter number)
 2026-11-11 16:45:54,032 - WARNING - Invalid choice. (invalid book number)
 2026-11-11 16:45:57,947 - WARNING - Invalid choice. (invalid book number)
 2026-11-11 16:47:44,691 - WARNING - Invalid choice. (invalid book number)
+2026-11-12 15:22:25,480 - WARNING - Author jane austen not found.
+2026-11-12 15:24:24,481 - WARNING - Author jane austen not found.
+2026-11-12 15:26:20,017 - WARNING - Invalid author. Empty string.
