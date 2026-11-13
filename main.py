@@ -1,39 +1,12 @@
 import logging
-from endpoints.bookname_api import search_book
-from library.personal_library import add_personal_library, open_personal_library
-from endpoints.authorsearch_api import search_for_author, show_author_works
+
+from actions.searching_author import choose_book_from_author, show_author_and_books, choose_book_from_author, \
+    search_author
+from library.personal_library import add_personal_library, open_personal_library, delete_book
+from actions.searching_book import search_book_query, book_choice
 
 #logging of the mistakes errors being made
 logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-#TODO: Maak een inlog page (maybe just use an username only, without passwords)
-
-
-#search book
-def search_book_query(): # they enter a book and they see results
-    title = input("Enter your book title: ")
-    books = search_book(title)
-
-    for number, book in enumerate(books, start=1):
-        author = book.get("author_name", ["Unknown author"])
-        year_published = book.get("first_publish_year", "unknown year")
-        print(f"{number}. {book['title']} - {author[0]} ({year_published}) " )
-    return books
-
-def book_choice(books): #with this the user can choose a book
-    while True:
-        book_number = int(input("Choose the book number or go back with 0."))
-        if book_number == 0:
-            break
-        elif book_number > 0 or book_number < len(books):
-            chosen_book = books[book_number-1]
-            print(f"Book chosen: {chosen_book['title']} by {chosen_book['author_name']} ")
-            return chosen_book
-        else:
-            print(f"invalid choice. Please enter a number from 0 to {len(books)}.")
-            logging.warning(f"Invalid choice. (invalid book number)")
-
-#TODO: maak menu page
 
 def main_menu():
     print("|------- Your Personal Library -------|")
@@ -66,35 +39,69 @@ def main_menu():
 
                 if book_menu == "1":
                     add_personal_library(chosen_book)
-                    print(f"Book added to {username}'s library!")
+                    print("What's next?")
+
                 if book_menu == "2":
-                    #TODO: add search author api (temporary pass)
-                    pass
+                        author_chosen_name = chosen_book.get("author_name", ["Unknown author"])[0]
+                        author_books = show_author_and_books(author_chosen_name)
+
+                        if author_books:
+                            picked_book = choose_book_from_author(author_books)
+
+                            if picked_book:
+                                add_choice = input(f"Add '{picked_book['title']}' to your library? (y/n): ")
+                                if add_choice.lower() == "y":
+                                    add_personal_library(picked_book)
+                                elif add_choice.lower() == "n":
+                                    pass
+                                else:
+                                    print("Invalid choice. Please try y or n")
+                                    logging.warning(f"Invalid choice. (y/n answer)")
                 if book_menu == "3":
                     pass
 
         elif choice == 2: # searching for an author
-            #TODO: ADD SEARCHING_AUTHOR.PY
-            pass
+            author_books = search_author()
 
-        elif choice == 3:
-            #TODO: FIX NAMES BEING WEIRD
-            #TODO: (IF I HAVE TIME) ADD DELETING
+            if author_books:
+                picked_book = choose_book_from_author(author_books)
+
+                if picked_book:
+                    add_choice = input(f"Add '{picked_book['title']}' to your library? (y/n): ")
+                    if add_choice.lower() == "y":
+                        add_personal_library(picked_book)
+
+
+
+        elif choice == 3: #view the library
             library = open_personal_library()
             print(f"---{username}'s library ---")
-            for number, item in enumerate(library, start=1):
-                print(f"{item['title']} - {item['author_name']}")
+            for number, item in enumerate(library, start=1): #show all the books
+                author = item.get("author_name", ["Unknown author"])[0]
+                print(f"{number}. {item['title']} - {author}")
             delete_menu = input("type 'delete' to delete an item or go back with 0.")
+            #deleting menu
             if delete_menu == "delete":
-                pass
+                number_text = input("Which book number do you want to delete? (Choose number) ")
+                try:
+                    removed = delete_book(int(number_text))
+                except ValueError:
+                    print("Please enter a number.")
+                    logging.warning(f"Invalid delete input (not a number): {number_text}")
+                    continue
+
+                if removed:
+                    print(f"Deleted: {removed['title']}")
+                else:
+                    print("That book number doesn't exist.")
+                    logging.warning(f"Invalid book number to delete: {number_text}")
             if delete_menu == "0":
                 pass
-
-
-
+        #exit
         elif choice == 4:
             print(f"Goodbye {username}!")
             break
+        #error
         else:
             print("Invalid choice. Please try again.")
             logging.warning(f"Invalid choice. (invalid menu number)")
