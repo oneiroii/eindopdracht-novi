@@ -1,8 +1,7 @@
 import logging
 
-from actions.searching_author import choose_book_from_author, show_author_and_books, choose_book_from_author, \
-    search_author
-from library.personal_library import add_personal_library, open_personal_library, delete_book
+from actions.searching_author import show_author_and_books, search_author
+from library.personal_library import add_personal_library, open_personal_library, delete_book, change_status
 from actions.searching_book import search_book_query, book_choice
 
 #logging of the mistakes errors being made
@@ -46,7 +45,7 @@ def main_menu():
                         author_books = show_author_and_books(author_chosen_name)
 
                         if author_books:
-                            picked_book = choose_book_from_author(author_books)
+                            picked_book = book_choice(author_books)
 
                             if picked_book:
                                 add_choice = input(f"Add '{picked_book['title']}' to your library? (y/n): ")
@@ -64,12 +63,18 @@ def main_menu():
             author_books = search_author()
 
             if author_books:
-                picked_book = choose_book_from_author(author_books)
+                picked_book = book_choice(author_books)
 
                 if picked_book:
                     add_choice = input(f"Add '{picked_book['title']}' to your library? (y/n): ")
                     if add_choice.lower() == "y":
                         add_personal_library(picked_book)
+                    elif add_choice.lower() == "n":
+                        pass
+                    else:
+                        print("Invalid choice. Please try y or n")
+                        logging.warning(f"Invalid choice. (y/n answer)")
+
 
 
 
@@ -77,11 +82,10 @@ def main_menu():
             library = open_personal_library()
             print(f"---{username}'s library ---")
             for number, item in enumerate(library, start=1): #show all the books
-                author = item.get("author_name", ["Unknown author"])[0]
-                print(f"{number}. {item['title']} - {author}")
-            delete_menu = input("type 'delete' to delete an item or go back with 0.")
+                print(f"{number}. {item['title']} - {item['author']} [{item['status']}]")
+            delete_change_menu = input("Type 'delete' to delete a book, 'status' to change a status, or 0 to go back:")
             #deleting menu
-            if delete_menu == "delete":
+            if delete_change_menu == "delete":
                 number_text = input("Which book number do you want to delete? (Choose number) ")
                 try:
                     removed = delete_book(int(number_text))
@@ -89,14 +93,44 @@ def main_menu():
                     print("Please enter a number.")
                     logging.warning(f"Invalid delete input (not a number): {number_text}")
                     continue
-
                 if removed:
                     print(f"Deleted: {removed['title']}")
                 else:
                     print("That book number doesn't exist.")
                     logging.warning(f"Invalid book number to delete: {number_text}")
-            if delete_menu == "0":
-                pass
+
+            #change the status
+            elif delete_change_menu == "status":
+                number_text = input("Which book do you want to change? (Choose number) ")
+                try:
+                    book_number = int(number_text)
+                except ValueError:
+                    print("Please enter a number.")
+                    logging.warning(f"Invalid status input (not a number): {number_text}")
+                    continue
+
+                print("1. to be read")
+                print("2. reading")
+                print("3. read")
+                status_choice = input("Choose the new status: ")
+
+                if status_choice == "1":
+                    new_status = "to be read"
+                elif status_choice == "2":
+                    new_status = "reading"
+                elif status_choice == "3":
+                    new_status = "read"
+                else:
+                    print("Invalid status. Please choose 1, 2 or 3.")
+                    logging.warning(f"Invalid status choice: {status_choice}")
+                    continue
+
+                changed = change_status(book_number, new_status)
+                if changed:
+                    print(f"{changed['title']} is now '{new_status}'.")
+                else:
+                    print("That book number doesn't exist.")
+                    logging.warning(f"Invalid book number to change status: {number_text}")
         #exit
         elif choice == 4:
             print(f"Goodbye {username}!")

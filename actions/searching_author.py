@@ -12,7 +12,7 @@ def search_author():
     return show_author_and_books(insert_author)
 
 
-def show_author_and_books(author_name):
+def show_author_and_books(author_name): #as it says show the author and all the books
     searched_author = search_for_author_with_api(author_name)
 
     if not searched_author:
@@ -27,21 +27,12 @@ def show_author_and_books(author_name):
     author_key = first_result.get("key")
 
     author_books = show_author_works_with_api(author_key)
+    for book in author_books:
+        book["author_name"] = [author]
 
     print(f"Author: {author} ({birth_date}), Most popular: {top_work}")
     for number, book in enumerate(author_books, start=1):
         print(f"{number}. {book['title']}")
 
     return author_books
-
-def choose_book_from_author(author_books): #choose a book or small menu
-    author_menu = int(input("Choose a book number or go back with 0. "))
-    if author_menu == 0:
-        return None
-    elif author_menu <= 0 or author_menu <= len(author_books):
-        return author_books[author_menu-1]
-    else:
-        print(f"Invalid choice. Please try again.")
-        logging.warning("Invalid choice. Please try again.")
-        return None
 

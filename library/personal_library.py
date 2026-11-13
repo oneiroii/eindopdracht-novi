@@ -16,19 +16,39 @@ def save_personal_library(library):
         json.dump(library, file)
 
 def add_personal_library(book):
+    library_book = {
+        "title": book["title"],
+        "author": book.get("author_name", ["Unknown author"])[0],
+        "key": book["key"],
+        "status": "to be read"
+    }
     library = open_personal_library()
-    if book in library:
+    if library_book in library:
         print(f"This book is already in the library!")
-        logging.warning(f"{book} was already in library")
+        logging.warning(f"{library_book} was already in library")
     else:
-        library.append(book)
+        library.append(library_book)
         save_personal_library(library)
-        print(f"{book} added to library!")
+        print(f"{library_book['title']} added to library!")
 
 def delete_book(book_number):
     library = open_personal_library()
+
+    if book_number < 1 or book_number > len(library): #check numbers
+        return None
 
     removed_book = library.pop(book_number - 1)
     save_personal_library(library)
     logging.info(f"Removed book: {removed_book}")
     return removed_book
+
+def change_status(book_number, new_status):
+    library = open_personal_library()
+
+    if book_number < 1 or book_number > len(library):
+        return None
+
+    library[book_number - 1]["status"] = new_status
+    save_personal_library(library)
+    logging.info(f"Status changed: {library[book_number - 1]['title']} -> {new_status}")
+    return library[book_number - 1]
